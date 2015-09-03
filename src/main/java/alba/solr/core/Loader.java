@@ -138,16 +138,15 @@ public class Loader extends DynamicSearchComponent {
 		}
 
 		for (Class<?> c : classes) {
-
-			loadMethods(c, c.getAnnotation(AlbaPlugin.class), functions);
+			
+				loadMethods(c, c.getAnnotation(AlbaPlugin.class), functions);
 
 			AlbaPlugin sdpAnnotation = (AlbaPlugin) c.getAnnotation(AlbaPlugin.class);
 
 
 			if (sdpAnnotation != null) {
 
-				logger.error(c.getName() + " is annotated with Plugin");
-
+		
 				Constructor constructor;
 				try {
 					constructor = c.getConstructor(null);
@@ -155,16 +154,7 @@ public class Loader extends DynamicSearchComponent {
 
 					for (Method m : o.getClass().getMethods()) {
 						
-						/*
-						logger.error("analyzing method " + m.getName());
-						
-						for (Annotation ann : m.getAnnotations()) {
-							logger.error("found annotation " + ann.getClass().getName());
-						}
-						
-						logger.error("----------");
-						*/
-						
+
 						FunctionQuery sdf = (FunctionQuery) m.getAnnotation(FunctionQuery.class);
 						if (sdf != null) {
 							CallableFunction cf = new CallableFunction(sdf.name(), o, m, m.getReturnType());
@@ -231,7 +221,6 @@ public class Loader extends DynamicSearchComponent {
 						
 						AlbaResponseWriter albaRWAnnotation = (AlbaResponseWriter) m.getAnnotation(AlbaResponseWriter.class);
 						if (albaRWAnnotation != null) {
-							logger.error("found method for RW - " + m.getName());
 							CallableFunction cf = new CallableFunction(albaRWAnnotation.value(), o, m, m.getReturnType());
 							
 							Parameter params[] = m.getParameters();
@@ -333,7 +322,6 @@ public class Loader extends DynamicSearchComponent {
 		}
 		
 		for (String s : responseWriters.keySet()) {
-			logger.error("registering rw " + s);
 			AlbaResponseWriterBase arh = responseWriters.get(s);
 			// do we need this?? maybe we need for custom transformers?
 			//arh.setFunctions(functions);
