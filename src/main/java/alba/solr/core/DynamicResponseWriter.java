@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +32,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StoredField;
+import org.apache.lucene.index.IndexableField;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
@@ -40,9 +46,11 @@ import org.apache.solr.response.QueryResponseWriter;
 import org.apache.solr.response.ResponseWriterUtil;
 import org.apache.solr.response.ResultContext;
 import org.apache.solr.response.SolrQueryResponse;
+import org.apache.solr.response.XMLWriter;
 import org.apache.solr.response.transform.DocTransformer;
 import org.apache.solr.response.transform.DocTransformers;
 import org.apache.solr.response.transform.TransformContext;
+import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.search.DocList;
 import org.apache.solr.search.ReturnFields;
 import org.slf4j.Logger;
@@ -52,72 +60,30 @@ public class DynamicResponseWriter implements QueryResponseWriter {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
+	private IndexSchema schema;
 
-	//@Override
-	public void xwrite(Writer writer, SolrQueryRequest request,
-			SolrQueryResponse response) throws IOException {
-
-		SolrDocumentList docList = new SolrDocumentList();
-
-		SolrQueryResponse res = response;
-
-		int size = response.getValues().size();
-
-		for (int i = 0; i < size; i++) {
-			writer.write(response.getValues().getName(i) + "  ");
-		}
-
-		ResultContext rc = (ResultContext)response.getValues().get("response");
-
-		//	XMLWriter
-		//inspired from XMLWriter
-
-		DocList ids = rc.docs;
-		TransformContext context = new TransformContext();
-		context.query = rc.query;
-		ReturnFields fields = res.getReturnFields();
-		context.wantsScores = fields.wantsScore() && ids.hasScores();
-		context.req = request;
-
-
-		DocTransformer transformer = fields.getTransformer();
-
-		context.searcher = request.getSearcher();
-		context.iterator = ids.iterator();
-		if( transformer != null ) {
-			transformer.setContext( context );
-		}
-		int sz = ids.size();
-		Set<String> fnames = fields.getLuceneFieldNames();
-		for (int i=0; i<sz; i++) {
-			int id = context.iterator.nextDoc();
-			Document doc = context.searcher.doc(id, fnames);
-			SolrDocument sdoc = ResponseWriterUtil.toSolrDocument(doc, request.getSchema());
-			if( transformer != null ) {
-				TransformContext transformerContext = new TransformContext();
-				context.req = request;
-				transformer.setContext(context);
-				transformer.transform(sdoc, -1);
-			}
-
-
-			docList.add(sdoc);
-
-		}
-		if( transformer != null ) {
-			transformer.setContext( null );
-		}
-
-		writer.write(docList.toString());
-
-
-	}
 
 	@Override
 	public void write(Writer writer, SolrQueryRequest request,
 			SolrQueryResponse response) throws IOException {
+		
+		//TODO should be place in a constructor?
+		this.schema = request.getSchema();
+		
+	    SolrDocumentList docList = null;
+		
+		
+		//see public final void writeDocuments in TextResponseWriter
+		if (response.getValues().get("response").getClass() == ResultContext.class) {
+			ResultContext rc = (ResultContext)response.getValues().get("response");
+			
+			docList = getDocuments(rc, response.getReturnFields(), request);
+			
+		} else {
+			docList = (SolrDocumentList) response.getValues().get("response");
+		}
 
-		SolrDocumentList docList = (SolrDocumentList) response.getValues().get("response");
+		
 
 		String beanClassName = request.getParams().get("arw.beanClass");
 		if (beanClassName == null) {
@@ -191,7 +157,7 @@ public class DynamicResponseWriter implements QueryResponseWriter {
 			beanClass = Class.forName(beanClassName);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			throw new IOException(e.getMessage());
+			throw new IOException("class " + beanClassName + " not found - " + e.getMessage());
 		}
 
 		try {
@@ -250,60 +216,66 @@ public class DynamicResponseWriter implements QueryResponseWriter {
 			writer.close();
 		} 
 
-
-
-
-		/* mydocs.setDocs(docs);
-
-		JAXBContext jc = null;
-
-		try {
-			jc = JAXBContext.newInstance(MyDocs.class);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			logger.error("unable to create jaxb context", e);
-		}
-
-		 */
-
-
-
-
-		/*
-		List<MyDoc> docs = new DocumentObjectBinder().getBeans(MyDoc.class,docList);
-
-		MyDocs<MyDoc>  mydocs = new MyDocs<MyDoc>();
-
-		mydocs.setDocs(docs);
-
-		JAXBContext jc = null;
-
-		try {
-			jc = JAXBContext.newInstance(MyDocs.class);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			logger.error("unable to create jaxb context", e);
-		}
-
-
-		Marshaller m = null;
-		try {
-			m = jc.createMarshaller();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			logger.error("unable to create marshaller", e);
-		}
-
-		try {
-			m.marshal(mydocs, writer);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			logger.error("error while marshalling", e);
-			writer.close();
-		} 
-
-		 */
 	}
+
+	
+	// see  public final void writeDocuments(String name, ResultContext res, ReturnFields fields )
+	//      in TextResponseWriter
+	// TODO REALLY NEED TO TEST THIS PART!
+	private SolrDocumentList  getDocuments(ResultContext res, ReturnFields fields, SolrQueryRequest req) throws IOException {
+	    DocList ids = res.docs;
+	    TransformContext context = new TransformContext();
+	    context.query = res.query;
+	    context.wantsScores = fields.wantsScore() && ids.hasScores();
+	    context.req = req;
+	    
+	    SolrDocumentList documents = new SolrDocumentList();
+	    
+	   // writeStartDocumentList(name, ids.offset(), ids.size(), ids.matches(), 
+	    //    context.wantsScores ? new Float(ids.maxScore()) : null );
+	    
+	    DocTransformer transformer = fields.getTransformer();
+	    context.searcher = req.getSearcher();
+	    context.iterator = ids.iterator();
+	    if( transformer != null ) {
+	      transformer.setContext( context );
+	    }
+	    int sz = ids.size();
+	    Set<String> fnames = fields.getLuceneFieldNames();
+	    for (int i=0; i<sz; i++) {
+	      int id = context.iterator.nextDoc();
+	      Document doc = context.searcher.doc(id, fnames);
+	      
+	      Set<String> fieldNames = this.schema.getFields().keySet();
+	 	    
+	      SolrDocument d = new SolrDocument();
+	      
+	      for (String fname : fieldNames) {
+	    	  Object val =doc.getField(fname);
+	    	  
+	    	  if ((val instanceof StoredField) || (val instanceof Field)) {
+	    		  Object o = this.schema.getField(fname).getType().toObject((IndexableField) val);
+	    		  
+	    		  d.setField(fname, o);
+	    		} 
+	    	  
+	      }
+	      
+	      if( transformer != null ) {
+	          transformer.transform( d, id);
+	        }
+	      
+	      documents.add(d);
+
+	    }
+	    if( transformer != null ) {
+	      transformer.setContext( null );
+	    }
+	  
+	    return documents;
+	  }
+		
+	
 
 	@Override
 	public String getContentType(SolrQueryRequest request,
@@ -314,10 +286,15 @@ public class DynamicResponseWriter implements QueryResponseWriter {
 
 	@Override
 	public void init(NamedList args) {
-		// TODO Auto-generated method stub
-
+	
 	}
 
+	
+	public final SolrDocument toSolrDocument( Document doc ) 
+	  {
+	    return ResponseWriterUtil.toSolrDocument(doc, this.schema);
+	  }
+	  
 
 
 }
