@@ -130,8 +130,6 @@ public  class FunctionExecutor extends MultiFunction {
 
 	    final CallableFunction fn = this.function;
 	    
-	    logger.error("calling " + this.function.getMethod() + " - " + this.function.getReturnType());
-
 		FunctionExecutor host = this;
 
 		if ((this.function.getReturnType() == Boolean.class) || (this.function.getReturnType() == boolean.class)) {
@@ -378,7 +376,8 @@ public  class FunctionExecutor extends MultiFunction {
 
 
 		int i = 0;
-		logger.error("setting function to " + callableFunction.getMethod().getName());
+		//logger.debug("setting function to " + callableFunction.getMethod().getName());
+	
 		//TODO spostare quanto più codice possibile in fase di inizializzazione
 		for (Parameter p : methodParameters) {
 			if (p.isAnnotationPresent(Param.class)) {
