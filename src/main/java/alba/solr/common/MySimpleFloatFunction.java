@@ -29,10 +29,11 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
+import org.apache.solr.search.DocList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import alba.solr.annotations.AlbaResponseWriter;
+import alba.solr.annotations.ResponseWriter;
 import alba.solr.annotations.DocTransformer;
 import alba.solr.annotations.FunctionQuery;
 import alba.solr.annotations.Param;
@@ -323,10 +324,11 @@ public class MySimpleFloatFunction {
 		doc.setField("abc", 12);
 	}
 	
+	
 
 
 
-	@AlbaResponseWriter(value="alba", responseType="text/plain") 
+	@ResponseWriter(value="alba", responseType="text/plain") 
 	public void myResponseWriter (Writer writer, SolrQueryRequest request,
 			SolrQueryResponse response) throws IOException {
 		writer.write("<h1>hello world!</h1>\n\r");
