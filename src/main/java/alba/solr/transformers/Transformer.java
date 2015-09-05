@@ -138,9 +138,6 @@ public class Transformer extends TransformerFactory {
 			return null;
 		}
 		
-		for (String s : transformers.keySet()) {
-			logger.error("avail transformer " + s);
-		}
 		
 		CallableFunction function = transformers.get(name);
 		
@@ -158,7 +155,6 @@ public class Transformer extends TransformerFactory {
 		}
 		logger.error("******"); */
 		
-		logger.error("found transformer " + function.getMethod().getName());
 		PluggableDocTransformer docTransformer = new PluggableDocTransformer(function);
 
 		docTransformer.context = req.getContext();
