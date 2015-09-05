@@ -23,17 +23,20 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
+import org.apache.solr.search.DocList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import alba.solr.annotations.AlbaResponseWriter;
+import alba.solr.annotations.ResponseWriter;
 import alba.solr.annotations.DocTransformer;
 import alba.solr.annotations.FunctionQuery;
 import alba.solr.annotations.AlbaPlugin;
@@ -41,6 +44,7 @@ import alba.solr.annotations.PostFilter;
 import alba.solr.annotations.SolrLightPlugin;
 import alba.solr.annotations.SolrRequestHandler;
 import alba.solr.annotations.SolrSearchComponent;
+import alba.solr.core.AlbaResponseWriter.SolrDocumentListSerializationStrategy;
 import alba.solr.searchcomponents.AlbaRequestHandler;
 import alba.solr.searchcomponents.ISolrLightPlugin;
 import alba.solr.utils.PackageScanner;
@@ -79,7 +83,7 @@ public class Loader extends DynamicSearchComponent {
 
 	private HashMap<String, CallableFunction> docTransformers;
 	
-	private Map<String, AlbaResponseWriterBase> responseWriters;
+	private Map<String, AlbaResponseWriter> responseWriters;
 
 	private Map<Object, CachedResult> cachedResults;
 
@@ -105,7 +109,7 @@ public class Loader extends DynamicSearchComponent {
 
 		docTransformers = new HashMap<String, CallableFunction>();
 		
-		responseWriters = new HashMap<String, AlbaResponseWriterBase>();
+		responseWriters = new HashMap<String, AlbaResponseWriter>();
 
 		NamedList l = this.getInitParams();
 
@@ -219,7 +223,8 @@ public class Loader extends DynamicSearchComponent {
 							
 						}
 						
-						AlbaResponseWriter albaRWAnnotation = (AlbaResponseWriter) m.getAnnotation(AlbaResponseWriter.class);
+						ResponseWriter albaRWAnnotation = (ResponseWriter) m.getAnnotation(ResponseWriter.class);
+						
 						if (albaRWAnnotation != null) {
 							CallableFunction cf = new CallableFunction(albaRWAnnotation.value(), o, m, m.getReturnType());
 							
@@ -233,9 +238,27 @@ public class Loader extends DynamicSearchComponent {
 								    (params[2].getType() != SolrQueryResponse.class)) {
 									logger.error("Methods annotated with AlbaResponseWriter must accept at least three params: Writer, SolrQueryRequest and SolrQueryResponse.");												
 								} else {
+									AlbaResponseWriter responseWriter = null;
 									
-									//TODO it should be possible to choose a different class instead of AlbaResponseWriterBase
-									AlbaResponseWriterBase responseWriter = new AlbaResponseWriterBase(cf);
+									AlbaResponseWriter.SolrDocumentListSerializationStrategy serializationStrategy = null;
+									
+									Type customSerializationType = null;
+									
+									if (params.length > 3) {
+										if (params[3].getType() == SolrDocumentList.class) {
+											logger.error("we'll pass doclist to " + m.getName());
+											serializationStrategy = AlbaResponseWriter.SolrDocumentListSerializationStrategy.DEFAULT;
+										} else
+										if (params[3].getType() == List.class) {
+											logger.error("we'll pass bean list to " + m.getName());
+											logger.error("we'll try to bind to " + params[3].getParameterizedType().toString());
+											customSerializationType = params[3].getParameterizedType();
+											serializationStrategy = AlbaResponseWriter.SolrDocumentListSerializationStrategy.CUSTOM;
+										}
+										
+									}
+									
+									responseWriter = new AlbaResponseWriter(cf, serializationStrategy, customSerializationType);
 								
 									responseWriters.put(albaRWAnnotation.value(), responseWriter);
 								}
@@ -322,7 +345,7 @@ public class Loader extends DynamicSearchComponent {
 		}
 		
 		for (String s : responseWriters.keySet()) {
-			AlbaResponseWriterBase arh = responseWriters.get(s);
+			AlbaResponseWriter arh = responseWriters.get(s);
 			// do we need this?? maybe we need for custom transformers?
 			//arh.setFunctions(functions);
 			this.getResponseBuilder().req.getCore().registerResponseWriter(s, arh);
