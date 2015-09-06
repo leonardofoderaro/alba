@@ -8,8 +8,11 @@ Each plugin is implemented as an annotated method, and the framework takes care 
 
 Consider the following scenarios:
 
+
 1) you need boost/filter/sort your search results with longer description.
+
 2) you need to modify your search results "on the fly" before they are returned to the client, eg. add/modify/delete some fields
+
 3) you need to serialize your search results in a custom XML schema 
 
 of course, to do it "the right way", each of the above scenario would normally require a different strategy.
