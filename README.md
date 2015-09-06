@@ -1,4 +1,4 @@
-# alba
+# Alba
 
 Solr Plugins made simple.
 
@@ -7,7 +7,6 @@ Alba is a small framework aimed to simplify the development of Solr plugins prot
 Each plugin is implemented as an annotated method, and the framework takes care of its execution through reflection.
 
 Consider the following scenarios:
-
 
 1) you need boost/filter/sort your search results with longer description.
 
