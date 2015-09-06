@@ -51,17 +51,17 @@ import alba.solr.utils.PackageScanner;
 
 public class Loader extends DynamicSearchComponent {
 
-	public static final Object SEARCHCOMPONENTS = "slp.searchComponents";
+	public static final Object SEARCHCOMPONENTS = "alba.searchComponents";
 	
-	public static final Object RESPONSEWRITERS = "slp.responseWriters";
+	public static final Object RESPONSEWRITERS = "alba.responseWriters";
 	
-	public static final Object FUNCTIONS = "slp.functions";
+	public static final Object FUNCTIONS = "alba.functions";
 
-	public static final Object POSTFILTERS = "slp.postfilters";
+	public static final Object POSTFILTERS = "alba.postfilters";
 
-	public static final Object DOCTRANSFORMERS = "slp.docTransformers";
+	public static final Object DOCTRANSFORMERS = "alba.docTransformers";
 	
-	public static final Object CACHEDRESULTS = "slp.cachedResults";
+	public static final Object CACHEDRESULTS = "alba.cachedResults";
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -73,6 +73,7 @@ public class Loader extends DynamicSearchComponent {
 
 	private Map<String, CallableFunction> searchComponents;
 
+	//TODO do we still need this? isn't it replaced by functions?
 	private Map<String, SolrPseudoField> pseudoFields;
 
 	private Map<String, DocValuesDynamicValueSource> dynamicFunctions;

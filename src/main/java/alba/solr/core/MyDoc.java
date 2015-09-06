@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.solr.client.solrj.beans.Field;
 
+
+//TODO move this to a separate project
+
 @XmlRootElement(name="mydoc")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MyDoc {

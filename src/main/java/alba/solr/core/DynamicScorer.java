@@ -77,22 +77,7 @@ public class DynamicScorer extends Scorer {
 			logger.error("matchesValue " + doc, e);
 			return false;
 		}
-		/*
-		logger.error("SLOW matches for " + doc);
-		
-		functionParams[0] = doc;
-		
-		try {
-			boolean b = (boolean)this.function.getMethod().invoke(this.function.getInstance(), functionParams);
-			return b;
-		} catch (IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			logger.error("error in matcheValue for doc " + doc, e);
-			return false;
-		}
-		
-		*/
+	
 		
 	}
 

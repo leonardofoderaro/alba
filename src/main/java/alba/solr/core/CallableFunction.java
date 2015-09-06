@@ -39,7 +39,6 @@ public class CallableFunction {
 	private Map<Integer,Integer> results;
 
 	public CallableFunction(String name, Object o, Method m, Class<?> returnType) {
-		// TODO Auto-generated constructor stub
 		this.instance = o;
 		this.method = m;
 		this.returnType = returnType;

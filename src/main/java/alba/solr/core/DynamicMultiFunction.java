@@ -56,7 +56,7 @@ public class DynamicMultiFunction extends MultiFunction implements ISolrLightPlu
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 
-	//TODO anziche' una lista dev'essere una mappa?
+	//TODO shuold it be a map instead of a list?
 	public DynamicMultiFunction(List<ValueSource> sources, List<Object> consts, FunctionQParser fp, Map<String, String> args, Map<String, CallableFunction> functions) {
 		super(sources);
 		this.consts = consts;
@@ -66,22 +66,14 @@ public class DynamicMultiFunction extends MultiFunction implements ISolrLightPlu
 
 		helper = new DynamicDocValuesHelper(this, args, fp);
 
-
 		helper.setFunctions(functions);
-
-
-
-
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected String name() {
-		// TODO Auto-generated method stub
 		return "multi";
 	}
 
-	//public abstract FunctionValues getFunctionValues();
 
 	public static FunctionValues[] valsArr(List<ValueSource> sources, Map fcontext, LeafReaderContext readerContext) throws IOException {
 		final FunctionValues[] valsArr = new FunctionValues[sources.size()];
@@ -100,17 +92,13 @@ public class DynamicMultiFunction extends MultiFunction implements ISolrLightPlu
 	}
 
 	public void setFunctionName(String functionName) {
-		// TODO Auto-generated method stub
 		this.functionName = functionName;
 	}
 
 	@Override
 	public FunctionValues getValues(Map context, LeafReaderContext readerContext)
 			throws IOException {
-		// TODO Auto-generated method stub
 		FunctionValues[] vals =  DynamicMultiFunction.valsArr(sources, context, readerContext);
-
-		//FunctionValues fv = this.getFunctionValues();
 
 		List<Object> params = new ArrayList<Object>();
 
@@ -122,8 +110,6 @@ public class DynamicMultiFunction extends MultiFunction implements ISolrLightPlu
 				params.add(this.consts.get(i));
 			}
 		}
-
-
 
 		helper.setVals(vals);
 

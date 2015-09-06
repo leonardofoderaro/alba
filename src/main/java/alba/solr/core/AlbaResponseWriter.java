@@ -32,6 +32,8 @@ import org.apache.solr.search.ReturnFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import alba.solr.annotations.ResponseWriter;
+
 public class AlbaResponseWriter implements QueryResponseWriter {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
@@ -199,7 +201,14 @@ public class AlbaResponseWriter implements QueryResponseWriter {
 			Object obj = this.function.getMethod().invoke(this.function.getInstance(), params);
 			
 			if (obj != null) {
-				serializeToXML(writer, obj);
+				ResponseWriter rw = this.function.getMethod().getAnnotation(ResponseWriter.class);
+				
+				if (rw.responseType().equals("text/xml")) {
+					serializeToXML(writer, obj);
+				} 
+				
+				//TODO handle more cases. should they be pluggable?
+				
 			}
 			
 		} catch (IllegalAccessException | IllegalArgumentException

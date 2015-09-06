@@ -45,6 +45,8 @@ import alba.solr.core.CallableFunction;
 import alba.solr.core.Loader;
 import alba.solr.core.MyDoc;
 
+//TODO move this to a separate project
+
 
 @AlbaPlugin
 public class MySimpleFloatFunction {
@@ -338,16 +340,6 @@ public class MySimpleFloatFunction {
 	}
 
 
-	public static void main(String[] args) {
-		MyDoc doc = new MyDoc();
-		doc.label = "ciao";
-
-		DocumentObjectBinder dob = new DocumentObjectBinder();
-
-		SolrInputDocument sd = dob.toSolrInputDocument(doc);
-
-		System.out.println(sd.toString());
-
-	}
+	
 
 }
