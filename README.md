@@ -20,3 +20,14 @@ for example, the best approach for #1 would be to reindex your data with the new
 With the Alba Framework you can play with your index in a fraction of that time.
 
 Please refer to the project wiki and the related repos for detailed examples.
+
+Build
+==
+mvn -Dmaven.skip.test=true package install
+
+copy target/alba-0.1.0-SNAPSHOT.jar /your/solrcloud/path/custom-libs/
+
+[edit](https://github.com/leonardofoderaro/alba/wiki/Setup) your sorlconfig.xml
+
+wget -O - "http://localhost:8983/solr/admin/collections?action=RELOAD&name=<yourcollection>"
+
