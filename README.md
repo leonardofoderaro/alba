@@ -46,3 +46,6 @@ copy target/alba-0.1.0-SNAPSHOT.jar /your/solrcloud/path/custom-libs/
 
 wget -O - "http://localhost:8983/solr/admin/collections?action=RELOAD&name=yourcollection"
 
+
+currently compatible with SolrCloud 5.2.1
+
