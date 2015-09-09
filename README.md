@@ -1,6 +1,6 @@
 # Alba
 
-Solr Plugins made simple.
+Solr Plugins made easy.
 
 Alba is a small framework aimed to simplify the development of Solr plugins prototypes. 
 
