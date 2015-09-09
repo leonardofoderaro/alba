@@ -22,14 +22,14 @@ With the Alba Framework you can play with your index in a fraction of that time:
     @AlbaPlugin(name="myPluginsLibrary")
     public class MyPlugins {
         
-      @FunctionQuery(name="len", description="returns the length of a string")
-      public Integer len(@Param(name="string", description="the string to measure") String s) {
-        return s.length();
-      }
-      
       @DocTransformer(name="helloworld")
       public void hello(SolrDocument doc) {
         doc.setField("message", "Hello, World!");
+      }
+        
+      @FunctionQuery(name="len", description="returns the length of a string")
+      public Integer len(@Param(name="string", description="the string to measure") String s) {
+        return s.length();
       }
       
     }
