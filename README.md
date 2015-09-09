@@ -17,7 +17,22 @@ Consider the following scenarios:
 of course, to do it "the right way", each of the above scenario would normally require a different strategy.
 for example, the best approach for #1 would be to reindex your data with the new field, while #2 and #3 could be done with an xslt filter, or with a custom Solr plugin, but the whole point is that all of them would require some time.
 
-With the Alba Framework you can play with your index in a fraction of that time.
+With the Alba Framework you can play with your index in a fraction of that time:
+
+    @AlbaPlugin(name="myPluginsLibrary")
+    public class MyPlugins {
+        
+      @FunctionQuery(name="len", description="returns the length of a string")
+      public Integer len(@Param(name="string", description="the string to measure") String s) {
+        return s.length();
+      }
+      
+      @DocTransformer(name="helloworld")
+      public void hello(SolrDocument doc) {
+        doc.setField("message", "Hello, World!");
+      }
+      
+    }
 
 Please refer to the wiki for detailed examples.
 
