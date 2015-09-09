@@ -38,7 +38,7 @@ Please refer to the wiki for detailed examples.
 
 Build
 ==
-mvn -Dmaven.skip.test=true package install
+mvn -Dmaven.test.skip=true package 
 
 copy target/alba-0.1.0-SNAPSHOT.jar /your/solrcloud/path/custom-libs/
 
