@@ -122,10 +122,8 @@ public class PackageScanner {
 			//logger.error("checking class " + cls.getName());
 
 			if (c == null || c.isAssignableFrom(cls)) {
-				//logger.error("OOOOOOOOOK " + cls.getName());
 				results.add(cls);
 			}
-
 
 		}
 
@@ -157,16 +155,14 @@ public class PackageScanner {
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("err", e);
 			}
 
 		} else {
 			System.out.println("root = " + root.getFile());
 
 			File[] fl = new File(root.getFile()).listFiles();
-			for (File f : fl) {
-				logger.error("found file " + f.getAbsolutePath());
-			}
+
 
 			// Filter .class files.
 			File[] files = new File(root.getFile()).listFiles(new FilenameFilter() {

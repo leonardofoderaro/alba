@@ -43,7 +43,7 @@ import alba.solr.annotations.AlbaPlugin;
 import alba.solr.annotations.PostFilter;
 import alba.solr.annotations.SolrLightPlugin;
 import alba.solr.annotations.SolrRequestHandler;
-import alba.solr.annotations.SolrSearchComponent;
+import alba.solr.annotations.SearchComponent;
 import alba.solr.core.AlbaResponseWriter.SolrDocumentListSerializationStrategy;
 import alba.solr.searchcomponents.AlbaRequestHandler;
 import alba.solr.searchcomponents.ISolrLightPlugin;
@@ -179,7 +179,7 @@ public class Loader extends DynamicSearchComponent {
 						}
 						
 						
-						SolrSearchComponent searchComponentAnnotation = (SolrSearchComponent) m.getAnnotation(SolrSearchComponent.class);
+						SearchComponent searchComponentAnnotation = (SearchComponent) m.getAnnotation(SearchComponent.class);
 						if (searchComponentAnnotation != null) {
 							
 							CallableFunction cf = new CallableFunction(searchComponentAnnotation.value(), o, m, m.getReturnType());

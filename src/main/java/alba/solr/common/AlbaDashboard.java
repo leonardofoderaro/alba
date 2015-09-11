@@ -7,7 +7,7 @@ import org.apache.solr.response.SolrQueryResponse;
 
 import alba.solr.annotations.AlbaPlugin;
 import alba.solr.annotations.SolrRequestHandler;
-import alba.solr.annotations.SolrSearchComponent;
+import alba.solr.annotations.SearchComponent;
 import alba.solr.core.CallableFunction;
 import alba.solr.core.Loader;
 
@@ -42,7 +42,7 @@ public class AlbaDashboard {
 	
 	
 	@SuppressWarnings("unchecked")
-	@SolrSearchComponent("functions")
+	@SearchComponent("functions")
 	public Map<String, CallableFunction> getFunctions(SolrQueryRequest req, SolrQueryResponse rsp) {
 		return (Map<String, CallableFunction>)req.getContext().get(Loader.FUNCTIONS);
 	}

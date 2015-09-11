@@ -40,7 +40,7 @@ import alba.solr.annotations.Param;
 import alba.solr.annotations.AlbaPlugin;
 import alba.solr.annotations.PostFilter;
 import alba.solr.annotations.SolrRequestHandler;
-import alba.solr.annotations.SolrSearchComponent;
+import alba.solr.annotations.SearchComponent;
 import alba.solr.core.CallableFunction;
 import alba.solr.core.Loader;
 import alba.solr.core.MyDoc;
@@ -311,7 +311,7 @@ public class MySimpleFloatFunction {
 
 
 
-	@SolrSearchComponent("prova")
+	@SearchComponent("prova")
 	public Map<Object, Object> searchComponent(SolrQueryRequest req, 
 			SolrQueryResponse rsp) {
 		Map<Object, Object> result = new HashMap<Object, Object>();
