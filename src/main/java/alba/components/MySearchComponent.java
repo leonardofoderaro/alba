@@ -7,6 +7,10 @@ import java.util.Map;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.SearchComponent;
 
+
+/*
+ * an example search component. probably it can be removed.
+ */
 public class MySearchComponent extends SearchComponent {
 
 	@Override

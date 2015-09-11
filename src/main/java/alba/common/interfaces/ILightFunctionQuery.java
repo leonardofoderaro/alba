@@ -22,6 +22,8 @@ import org.apache.lucene.queries.function.ValueSource;
 import org.apache.solr.handler.component.ResponseBuilder;
 
 
+//TODO still need this? probably not.
+
 public interface ILightFunctionQuery {
 	// per-request
 	public Object initialize(ResponseBuilder rb);
